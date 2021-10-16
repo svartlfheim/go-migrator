@@ -17,24 +17,24 @@ import (
 )
 
 func Test_postgresHandler_DoesTableExist(t *testing.T) {
-	tests := []struct{
-		name string
-		tableName string
-		opts Opts
-		shouldExist bool
-		expectedErr error
-		expectedErrType interface{}
+	tests := []struct {
+		name               string
+		tableName          string
+		opts               Opts
+		shouldExist        bool
+		expectedErr        error
+		expectedErrType    interface{}
 		expectedErrMatcher string
-		configureDB func (sqlmock.Sqlmock)
+		configureDB        func(sqlmock.Sqlmock)
 	}{
 		{
-			name: "schema opt not set",
-			opts: Opts{},
-			shouldExist: false,
+			name:            "schema opt not set",
+			opts:            Opts{},
+			shouldExist:     false,
 			expectedErrType: ErrInvalidOpts{},
 		},
 		{
-			name: "query error",
+			name:      "query error",
 			tableName: "mytable",
 			opts: Opts{
 				Schema: "myschema",
@@ -50,7 +50,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"mytable",
 				).WillReturnError(
 					errors.New("some query error"),
@@ -60,7 +60,7 @@ WHERE
 			expectedErr: errors.New("some query error"),
 		},
 		{
-			name: "table does exist",
+			name:      "table does exist",
 			tableName: "mytable",
 			opts: Opts{
 				Schema: "myschema",
@@ -76,7 +76,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"mytable",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("1"))
 			},
@@ -84,7 +84,7 @@ WHERE
 			expectedErr: nil,
 		},
 		{
-			name: "table does not exist",
+			name:      "table does not exist",
 			tableName: "mytable",
 			opts: Opts{
 				Schema: "myschema",
@@ -100,7 +100,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"mytable",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("0"))
 			},
@@ -108,7 +108,7 @@ WHERE
 			expectedErr: nil,
 		},
 		{
-			name: "value does not scan to int",
+			name:      "value does not scan to int",
 			tableName: "mytable",
 			opts: Opts{
 				Schema: "myschema",
@@ -124,39 +124,40 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"mytable",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("notanint"))
 			},
-			shouldExist: false,
+			shouldExist:        false,
 			expectedErrMatcher: "^sql: Scan error.*",
 		},
 	}
-	for _, test := range(tests) {
-		t.Run(test.name, func (tt *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(tt *testing.T) {
 			mockDB, mock, err := sqlmock.New()
+			//nolint:staticcheck
 			defer mockDB.Close()
-		
+
 			if err != nil {
 				t.Error("could not create postgres mock")
 			}
 			sqlxDB := sqlx.NewDb(mockDB, "postgres")
-		
+
 			if test.configureDB != nil {
 				test.configureDB(mock)
 			}
 
 			b := new(bytes.Buffer)
 			l := gomigratorteststubs.BuildZerologLogger(b)
-		
+
 			h := postgresHandler{
 				conn: sqlxDB,
-				l: l,
+				l:    l,
 				opts: test.opts,
 			}
-		
+
 			res, err := h.DoesTableExist(test.tableName)
-		
+
 			assert.Equal(tt, test.shouldExist, res)
 
 			if test.expectedErr != nil {
@@ -173,18 +174,18 @@ WHERE
 }
 
 func Test_postgresHandler_CreateMigrationsTable(t *testing.T) {
-	tests := []struct{
-		name string
-		tableName string
-		opts Opts
-		expectedErr error
+	tests := []struct {
+		name            string
+		tableName       string
+		opts            Opts
+		expectedErr     error
 		expectedErrType interface{}
-		expectedLogs []map[string]interface{}
-		configureDB func (sqlmock.Sqlmock)
+		expectedLogs    []map[string]interface{}
+		configureDB     func(sqlmock.Sqlmock)
 	}{
 		{
-			name: "error is returned from DoesTableExist",
-			opts: Opts{},
+			name:            "error is returned from DoesTableExist",
+			opts:            Opts{},
 			expectedErrType: ErrInvalidOpts{},
 		},
 		{
@@ -200,13 +201,13 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"migrations",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("1"))
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "skipping create migrations table as it already exists",
 				},
 			},
@@ -230,7 +231,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"migrations",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("0"))
 
@@ -238,7 +239,7 @@ WHERE
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "Creating migrations table as it was not present.",
 				},
 			},
@@ -262,7 +263,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"migrations",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("0"))
 
@@ -277,7 +278,7 @@ WHERE
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "Creating migrations table as it was not present.",
 				},
 			},
@@ -302,7 +303,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"migrations",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("0"))
 
@@ -317,7 +318,7 @@ WHERE
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "Creating migrations table as it was not present.",
 				},
 			},
@@ -342,7 +343,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"migrations",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("0"))
 
@@ -358,7 +359,7 @@ WHERE
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "Creating migrations table as it was not present.",
 				},
 			},
@@ -383,7 +384,7 @@ WHERE
 	table_name = $2;
 `)
 				m.ExpectQuery(q).WithArgs(
-					"myschema", 
+					"myschema",
 					"migrations",
 				).WillReturnRows(sqlmock.NewRows([]string{"count(1)"}).AddRow("0"))
 
@@ -399,37 +400,38 @@ WHERE
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "Creating migrations table as it was not present.",
 				},
 			},
 		},
 	}
-	for _, test := range(tests) {
-		t.Run(test.name, func (tt *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(tt *testing.T) {
 			mockDB, mock, err := sqlmock.New()
+			//nolint:staticcheck
 			defer mockDB.Close()
-		
+
 			if err != nil {
 				t.Error("could not create postgres mock")
 			}
 			sqlxDB := sqlx.NewDb(mockDB, "postgres")
-		
+
 			if test.configureDB != nil {
 				test.configureDB(mock)
 			}
 
 			b := new(bytes.Buffer)
 			l := gomigratorteststubs.BuildZerologLogger(b)
-		
+
 			h := postgresHandler{
 				conn: sqlxDB,
-				l: l,
+				l:    l,
 				opts: test.opts,
 			}
-		
+
 			err = h.CreateMigrationsTable()
-		
+
 			if test.expectedErr != nil {
 				assert.Equal(tt, test.expectedErr, err)
 			} else if test.expectedErrType != nil {
@@ -445,16 +447,16 @@ WHERE
 
 func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 
-	tests := []struct{
-		name string
-		id string
-		configureDB func (sqlmock.Sqlmock)
+	tests := []struct {
+		name           string
+		id             string
+		configureDB    func(sqlmock.Sqlmock)
 		expectedResult *MigrationRecord
-		expectedErr error
+		expectedErr    error
 	}{
 		{
 			name: "error from get",
-			id: "my-migration",
+			id:   "my-migration",
 			configureDB: func(m sqlmock.Sqlmock) {
 				m.ExpectQuery(
 					regexp.QuoteMeta("SELECT * FROM migrations WHERE id=$1"),
@@ -463,12 +465,12 @@ func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 				).WillReturnError(errors.New("query failed"))
 			},
 			expectedResult: nil,
-			expectedErr: errors.New("query failed"),
+			expectedErr:    errors.New("query failed"),
 		},
 
 		{
 			name: "no rows error from get",
-			id: "my-migration",
+			id:   "my-migration",
 			configureDB: func(m sqlmock.Sqlmock) {
 				m.ExpectQuery(
 					regexp.QuoteMeta("SELECT * FROM migrations WHERE id=$1"),
@@ -477,12 +479,12 @@ func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 				).WillReturnError(sql.ErrNoRows)
 			},
 			expectedResult: nil,
-			expectedErr: nil,
+			expectedErr:    nil,
 		},
 
 		{
 			name: "successfully retrieved",
-			id: "my-migration",
+			id:   "my-migration",
 			configureDB: func(m sqlmock.Sqlmock) {
 				m.ExpectQuery(
 					regexp.QuoteMeta("SELECT * FROM migrations WHERE id=$1"),
@@ -493,10 +495,10 @@ func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 						[]string{"id", "status", "events"},
 					).AddRow(
 						"my-migration", "applied", "[]",
-				))
+					))
 			},
 			expectedResult: &MigrationRecord{
-				Id: "my-migration",
+				Id:     "my-migration",
 				Status: "applied",
 				Events: []MigrationRecordEvent{},
 			},
@@ -505,7 +507,7 @@ func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 
 		{
 			name: "successfully retrieved with some events",
-			id: "my-migration",
+			id:   "my-migration",
 			configureDB: func(m sqlmock.Sqlmock) {
 				m.ExpectQuery(
 					regexp.QuoteMeta("SELECT * FROM migrations WHERE id=$1"),
@@ -516,17 +518,17 @@ func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 						[]string{"id", "status", "events"},
 					).AddRow(
 						"my-migration", "applied", "[{\"action\":\"apply\", \"actor\":\"joe\", \"performedat\":\"2021-10-11T09:00:00Z\", \"result\":\"applied\"}]",
-				))
+					))
 			},
 			expectedResult: &MigrationRecord{
-				Id: "my-migration",
+				Id:     "my-migration",
 				Status: "applied",
 				Events: []MigrationRecordEvent{
 					{
-						Action: "apply",
-						Actor: "joe",
+						Action:      "apply",
+						Actor:       "joe",
 						PerformedAt: "2021-10-11T09:00:00Z",
-						Result: "applied",
+						Result:      "applied",
 					},
 				},
 			},
@@ -534,30 +536,31 @@ func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 		},
 	}
 
-	for _, test := range(tests) {
-		t.Run(test.name, func (tt *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(tt *testing.T) {
 			mockDB, mock, err := sqlmock.New()
+			//nolint:staticcheck
 			defer mockDB.Close()
-		
+
 			if err != nil {
 				t.Error("could not create postgres mock")
 			}
 			sqlxDB := sqlx.NewDb(mockDB, "postgres")
-		
+
 			if test.configureDB != nil {
 				test.configureDB(mock)
 			}
 
 			b := new(bytes.Buffer)
 			l := gomigratorteststubs.BuildZerologLogger(b)
-		
+
 			h := postgresHandler{
 				conn: sqlxDB,
-				l: l,
+				l:    l,
 			}
-		
+
 			res, err := h.FetchMigrationFromDb(test.id)
-		
+
 			assert.Equal(tt, test.expectedResult, res)
 			if test.expectedErr != nil {
 				assert.Equal(tt, test.expectedErr, err)
@@ -567,12 +570,12 @@ func Test_postgresHandler_FetchMigrationFromDb(t *testing.T) {
 }
 
 type eventJsonSpec struct {
-	action string
-	actor string
-	result string
+	action      string
+	actor       string
+	result      string
 	timePattern string
 }
-type eventJsonArg struct{
+type eventJsonArg struct {
 	specs []eventJsonSpec
 }
 
@@ -594,11 +597,11 @@ func (a eventJsonArg) Match(v driver.Value) bool {
 		return false
 	}
 
-	for i, s := range(a.specs) {
+	for i, s := range a.specs {
 
 		m := mList[i]
 		_, err = time.Parse(s.timePattern, m.PerformedAt)
-	
+
 		if err != nil || m.Action != s.action || m.Actor != s.actor || m.Result != s.result {
 			return false
 		}
@@ -608,35 +611,35 @@ func (a eventJsonArg) Match(v driver.Value) bool {
 }
 
 func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
-	tests := []struct{
-		name string
-		id string
-		state MigrationState
-		action string
-		opts Opts
-		configureDB func(sqlmock.Sqlmock)
+	tests := []struct {
+		name         string
+		id           string
+		state        MigrationState
+		action       string
+		opts         Opts
+		configureDB  func(sqlmock.Sqlmock)
 		expectedLogs []map[string]interface{}
-		expectedErr error
+		expectedErr  error
 	}{
 		{
-			name: "error fetching migration",
-			id: "my-migration",
-			state: MigrationApplied,
+			name:   "error fetching migration",
+			id:     "my-migration",
+			state:  MigrationApplied,
 			action: "apply",
 			opts: Opts{
 				Applyer: "joe",
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "recording state",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 				{
-					"level": "error",
-					"error": "query failed",
+					"level":   "error",
+					"error":   "query failed",
 					"message": "error recording migration state",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -650,23 +653,23 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 		},
 
 		{
-			name: "inserting: exec fails",
-			id: "my-migration",
-			state: MigrationApplied,
+			name:   "inserting: exec fails",
+			id:     "my-migration",
+			state:  MigrationApplied,
 			action: "apply",
 			opts: Opts{
 				Applyer: "joe",
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "recording state",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "no existing entry for migration",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -685,9 +688,9 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 					eventJsonArg{
 						specs: []eventJsonSpec{
 							{
-								action: "apply",
-								actor: "joe",
-								result: string(MigrationApplied),
+								action:      "apply",
+								actor:       "joe",
+								result:      string(MigrationApplied),
 								timePattern: time.RFC3339,
 							},
 						},
@@ -698,23 +701,23 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 		},
 
 		{
-			name: "inserting: successful",
-			id: "my-migration",
-			state: MigrationApplied,
+			name:   "inserting: successful",
+			id:     "my-migration",
+			state:  MigrationApplied,
 			action: "apply",
 			opts: Opts{
 				Applyer: "joe",
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "recording state",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "no existing entry for migration",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -733,36 +736,36 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 					eventJsonArg{
 						specs: []eventJsonSpec{
 							{
-								action: "apply",
-								actor: "joe",
-								result: string(MigrationApplied),
+								action:      "apply",
+								actor:       "joe",
+								result:      string(MigrationApplied),
 								timePattern: time.RFC3339,
 							},
 						},
 					},
-				).WillReturnResult(sqlmock.NewResult(1,1))
+				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedErr: nil,
 		},
 
 		{
-			name: "updating: exec fails",
-			id: "my-migration",
-			state: MigrationApplied,
+			name:   "updating: exec fails",
+			id:     "my-migration",
+			state:  MigrationApplied,
 			action: "apply",
 			opts: Opts{
 				Applyer: "joe",
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "recording state",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "found existing entry for migration",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -776,7 +779,7 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 						[]string{"id", "status", "events"},
 					).AddRow(
 						"my-migration", "applied", "[{\"action\":\"apply\", \"actor\":\"bob\", \"performedat\":\"2021-10-11T09:00:00Z\", \"result\":\"applied\"}]",
-				))
+					))
 
 				m.ExpectExec(
 					regexp.QuoteMeta("UPDATE migrations SET status=$1, events=$2 WHERE id=$3"),
@@ -785,15 +788,15 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 					eventJsonArg{
 						specs: []eventJsonSpec{
 							{
-								action: "apply",
-								actor: "bob",
-								result: string(MigrationApplied),
+								action:      "apply",
+								actor:       "bob",
+								result:      string(MigrationApplied),
 								timePattern: time.RFC3339,
 							},
 							{
-								action: "apply",
-								actor: "joe",
-								result: string(MigrationApplied),
+								action:      "apply",
+								actor:       "joe",
+								result:      string(MigrationApplied),
 								timePattern: time.RFC3339,
 							},
 						},
@@ -805,23 +808,23 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 		},
 
 		{
-			name: "updating: successful",
-			id: "my-migration",
-			state: MigrationApplied,
+			name:   "updating: successful",
+			id:     "my-migration",
+			state:  MigrationApplied,
 			action: "apply",
 			opts: Opts{
 				Applyer: "joe",
 			},
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "recording state",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 				{
-					"level": "debug",
+					"level":   "debug",
 					"message": "found existing entry for migration",
-					"id": "my-migration",
+					"id":      "my-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -835,7 +838,7 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 						[]string{"id", "status", "events"},
 					).AddRow(
 						"my-migration", "applied", "[{\"action\":\"apply\", \"actor\":\"bob\", \"performedat\":\"2021-10-11T09:00:00Z\", \"result\":\"applied\"}]",
-				))
+					))
 
 				m.ExpectExec(
 					regexp.QuoteMeta("UPDATE migrations SET status=$1, events=$2 WHERE id=$3"),
@@ -844,50 +847,51 @@ func Test_postgresHandler_RecordMigrationInDb(t *testing.T) {
 					eventJsonArg{
 						specs: []eventJsonSpec{
 							{
-								action: "apply",
-								actor: "bob",
-								result: string(MigrationApplied),
+								action:      "apply",
+								actor:       "bob",
+								result:      string(MigrationApplied),
 								timePattern: time.RFC3339,
 							},
 							{
-								action: "apply",
-								actor: "joe",
-								result: string(MigrationApplied),
+								action:      "apply",
+								actor:       "joe",
+								result:      string(MigrationApplied),
 								timePattern: time.RFC3339,
 							},
 						},
 					},
 					"my-migration",
-				).WillReturnResult(sqlmock.NewResult(1,1))
+				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedErr: nil,
 		},
 	}
-	for _, test := range(tests) {
-		t.Run(test.name, func (tt *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(tt *testing.T) {
 			mockDB, mock, err := sqlmock.New()
+			//nolint:staticcheck
 			defer mockDB.Close()
-		
+
 			if err != nil {
 				t.Error("could not create postgres mock")
 			}
 			sqlxDB := sqlx.NewDb(mockDB, "postgres")
-		
+
 			if test.configureDB != nil {
 				test.configureDB(mock)
 			}
 
 			b := new(bytes.Buffer)
 			l := gomigratorteststubs.BuildZerologLogger(b)
-		
+
 			h := postgresHandler{
 				conn: sqlxDB,
-				l: l,
+				l:    l,
 				opts: test.opts,
 			}
-		
+
 			err = h.RecordMigrationInDb(test.id, test.state, test.action)
-		
+
 			assert.Equal(tt, test.expectedErr, err)
 
 			assert.Equal(t, test.expectedLogs, gomigratorteststubs.ExtractLogsToMap(b))

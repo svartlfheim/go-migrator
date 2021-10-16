@@ -1,0 +1,100 @@
+name: "Run CI checks"
+
+on: 
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths-ignore:
+      - '**/*.md'
+      - '*.md'
+      - 'Makefile'
+      - 'LICENSE'
+      - 'docker-compose.yaml'
+
+jobs:
+  lint:
+    name: "Run linter"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+
+  unit_test:
+    name: "Run unit tests"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version:
+          - 1.15.x
+          - 1.16.x
+          - 1.17.x
+    permissions:
+      repository-projects: read
+    # Cancel current run if new changes are pushed
+    concurrency: 
+      group: unit-test-${{ matrix.go-version }}-${{ github.head_ref }}
+      cancel-in-progress: true
+    steps:
+      - name: "Setup Go"
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: "Checkout code"
+        uses: actions/checkout@v2
+      - name: "Unit Test"
+        run: go test -cover ./...
+
+  integration_test:
+    name: "Run integration tests"
+    runs-on: "ubuntu-latest"
+    container: golang:${{ matrix.go-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version:
+          - 1.15
+          - 1.16
+          - 1.17
+    permissions:
+      repository-projects: read
+
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:13
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: iampostgres
+          POSTGRES_DB: "mydb"
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    concurrency: 
+      group: integration-test-${{ matrix.go-version }}-${{ github.head_ref }}
+      cancel-in-progress: true
+    env:
+      CI_INTEGRATION_TESTS_ENABLED: "true"
+      DB_DRIVER: postgres
+      DB_HOST: postgres
+      DB_PASSWORD: iampostgres
+      DB_USER: postgres
+      DB_SCHEMA: public
+      DB_DATABASE: mydb
+      DB_PORT: 5432
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
+      - name: "Run tests"
+        run: go test -run ".Integration" ./...

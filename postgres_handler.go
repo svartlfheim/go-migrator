@@ -12,7 +12,7 @@ import (
 type postgresHandler struct {
 	conn *sqlx.DB
 	opts Opts
-	l zerolog.Logger
+	l    zerolog.Logger
 }
 
 func (h *postgresHandler) DoesTableExist(table string) (bool, error) {
@@ -70,7 +70,7 @@ func (h *postgresHandler) CreateMigrationsTable() error {
 	);`
 
 	tx, err := h.conn.Beginx()
-	
+
 	if err != nil {
 		return ErrCouldNotCreateMigrationsTable{
 			Wrapped: err,
@@ -110,7 +110,11 @@ func (h *postgresHandler) FetchMigrationFromDb(id string) (*MigrationRecord, err
 
 	var events []MigrationRecordEvent
 
-	json.Unmarshal([]byte(migRecord.Events), &events)
+	err = json.Unmarshal([]byte(migRecord.Events), &events)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return &MigrationRecord{
 		Id:     migRecord.Id,

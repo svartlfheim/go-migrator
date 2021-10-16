@@ -7,36 +7,36 @@ import (
 
 type handlerDoesTableExistCall struct {
 	ExpectedTable string
-	DoesExist bool
-	Err error
+	DoesExist     bool
+	Err           error
 }
 
 type handlerFetchMigrationFromDbCall struct {
-	ExpectedId string
+	ExpectedId      string
 	MigrationRecord *MigrationRecord
-	Err error
+	Err             error
 }
 
 type handlerRecordMigrationInDbCall struct {
-	ExpectedId string
-	ExpectedState MigrationState
+	ExpectedId     string
+	ExpectedState  MigrationState
 	ExpectedAction string
-	Err error
+	Err            error
 }
 
 type handlerStub struct {
 	T *testing.T
 
-	CreateMigrationsTableCalls []error
+	CreateMigrationsTableCalls     []error
 	createMigrationsTableCallCount int
 
-	DoesTableExistCalls  []handlerDoesTableExistCall
+	DoesTableExistCalls     []handlerDoesTableExistCall
 	doesTableExistCallCount int
 
-	FetchMigrationFromDbCalls []handlerFetchMigrationFromDbCall
+	FetchMigrationFromDbCalls     []handlerFetchMigrationFromDbCall
 	fetchMigrationFromDbCallCount int
 
-	RecordMigrationInDbCalls []handlerRecordMigrationInDbCall
+	RecordMigrationInDbCalls     []handlerRecordMigrationInDbCall
 	recordMigrationInDbCallCount int
 }
 
@@ -46,7 +46,7 @@ func (h *handlerStub) CreateMigrationsTable() (err error) {
 		return
 	}
 
-	if h.createMigrationsTableCallCount > (len(h.CreateMigrationsTableCalls) -1) {
+	if h.createMigrationsTableCallCount > (len(h.CreateMigrationsTableCalls) - 1) {
 		h.T.Error("Too many calls to CreateMigrationsTable")
 		return
 	}
@@ -64,7 +64,7 @@ func (h *handlerStub) DoesTableExist(table string) (doesExist bool, err error) {
 		return
 	}
 
-	if h.doesTableExistCallCount > (len(h.DoesTableExistCalls) -1) {
+	if h.doesTableExistCallCount > (len(h.DoesTableExistCalls) - 1) {
 		h.T.Error("Too many calls to DoesTableExist")
 		return
 	}
@@ -87,7 +87,7 @@ func (h *handlerStub) FetchMigrationFromDb(id string) (migRecord *MigrationRecor
 		return
 	}
 
-	if h.fetchMigrationFromDbCallCount > (len(h.FetchMigrationFromDbCalls) -1) {
+	if h.fetchMigrationFromDbCallCount > (len(h.FetchMigrationFromDbCalls) - 1) {
 		h.T.Error("Too many calls to FetchMigrationFromDb")
 		return
 	}
@@ -110,7 +110,7 @@ func (h *handlerStub) RecordMigrationInDb(id string, state MigrationState, actio
 		return
 	}
 
-	if h.recordMigrationInDbCallCount > (len(h.RecordMigrationInDbCalls) -1) {
+	if h.recordMigrationInDbCallCount > (len(h.RecordMigrationInDbCalls) - 1) {
 		h.T.Error("Too many calls to RecordMigrationInDb")
 		return
 	}
@@ -123,7 +123,7 @@ func (h *handlerStub) RecordMigrationInDb(id string, state MigrationState, actio
 
 	if call.ExpectedId != id {
 		errors = append(
-			errors, 
+			errors,
 			fmt.Sprintf(
 				"Unexpected argument 'id' to RecordMigrationInDb; got '%s', expected '%s'",
 				id,
@@ -134,7 +134,7 @@ func (h *handlerStub) RecordMigrationInDb(id string, state MigrationState, actio
 
 	if call.ExpectedState != state {
 		errors = append(
-			errors, 
+			errors,
 			fmt.Sprintf(
 				"Unexpected argument 'state' to RecordMigrationInDb; got '%s', expected '%s'",
 				string(state),
@@ -145,16 +145,16 @@ func (h *handlerStub) RecordMigrationInDb(id string, state MigrationState, actio
 
 	if call.ExpectedAction != action {
 		errors = append(
-			errors, 
-			fmt.Sprintf("Unexpected argument 'action' to RecordMigrationInDb; got '%s', expected '%s'", 
-				action, 
+			errors,
+			fmt.Sprintf("Unexpected argument 'action' to RecordMigrationInDb; got '%s', expected '%s'",
+				action,
 				call.ExpectedAction,
 			),
 		)
 	}
 
 	if len(errors) > 0 {
-		for _, msg := range(errors) {
+		for _, msg := range errors {
 			h.T.Error(msg)
 		}
 

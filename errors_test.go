@@ -119,7 +119,6 @@ func TestErrNoMigrationsFound(t *testing.T) {
 	assert.Equal(t, "no migrations were configured", err.Error())
 }
 
-
 func TestErrInvalidOpts(t *testing.T) {
 	err := ErrInvalidOpts{
 		Message: "some message",

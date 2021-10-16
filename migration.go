@@ -117,3 +117,9 @@ type MigrationRecord struct {
 	Status string
 	Events []MigrationRecordEvent
 }
+
+func NewMigrationList(migs []Migration) MigrationList {
+	return MigrationList{
+		migrations: migs,
+	}
+}
