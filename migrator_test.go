@@ -14,7 +14,8 @@ import (
 )
 
 func Test_NewMigrator_Postgres(t *testing.T) {
-	mockDB, _, err := sqlmock.New()
+	mockDB, _, _ := sqlmock.New()
+	//nolint:staticcheck
 	defer mockDB.Close()
 	sqlxDB := sqlx.NewDb(mockDB, "postgres")
 
@@ -28,7 +29,8 @@ func Test_NewMigrator_Postgres(t *testing.T) {
 }
 
 func Test_NewMigrator_UnknownDriver(t *testing.T) {
-	mockDB, _, err := sqlmock.New()
+	mockDB, _, _ := sqlmock.New()
+	//nolint:staticcheck
 	defer mockDB.Close()
 	sqlxDB := sqlx.NewDb(mockDB, "unknown-driver")
 
@@ -42,11 +44,11 @@ func Test_NewMigrator_UnknownDriver(t *testing.T) {
 }
 
 func Test_Migrator_ListMigrations(t *testing.T) {
-	tests := []struct{
-		name string
-		h *handlerStub
-		migs MigrationList
-		expectedErr error
+	tests := []struct {
+		name         string
+		h            *handlerStub
+		migs         MigrationList
+		expectedErr  error
 		expectedMigs []*MigrationRecord
 	}{
 		{
@@ -58,7 +60,7 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 					errors.New("not today"),
 				},
 			},
-			expectedErr: errors.New("not today"),
+			expectedErr:  errors.New("not today"),
 			expectedMigs: []*MigrationRecord{},
 		},
 
@@ -72,7 +74,7 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 					nil,
 				},
 			},
-			expectedErr: nil,
+			expectedErr:  nil,
 			expectedMigs: []*MigrationRecord{},
 		},
 
@@ -94,13 +96,13 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						Err: errors.New("could not connect to db i guess"),
+						ExpectedId:      "my-first-migration",
+						Err:             errors.New("could not connect to db i guess"),
 						MigrationRecord: nil,
 					},
 				},
 			},
-			expectedErr: errors.New("could not connect to db i guess"),
+			expectedErr:  errors.New("could not connect to db i guess"),
 			expectedMigs: []*MigrationRecord{},
 		},
 
@@ -123,9 +125,9 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
 						ExpectedId: "my-first-migration",
-						Err: nil,
+						Err:        nil,
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 					},
@@ -134,7 +136,7 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 			expectedErr: nil,
 			expectedMigs: []*MigrationRecord{
 				{
-					Id: "my-first-migration",
+					Id:     "my-first-migration",
 					Status: string(MigrationApplied),
 				},
 			},
@@ -165,25 +167,25 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
 						ExpectedId: "my-first-migration",
-						Err: nil,
+						Err:        nil,
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 					},
 					{
 						ExpectedId: "my-second-migration",
-						Err: nil,
+						Err:        nil,
 						MigrationRecord: &MigrationRecord{
-							Id: "my-second-migration",
+							Id:     "my-second-migration",
 							Status: string(MigrationApplied),
 						},
 					},
 					{
 						ExpectedId: "my-third-migration",
-						Err: nil,
+						Err:        nil,
 						MigrationRecord: &MigrationRecord{
-							Id: "my-third-migration",
+							Id:     "my-third-migration",
 							Status: string(MigrationApplied),
 						},
 					},
@@ -192,15 +194,15 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 			expectedErr: nil,
 			expectedMigs: []*MigrationRecord{
 				{
-					Id: "my-first-migration",
+					Id:     "my-first-migration",
 					Status: string(MigrationApplied),
 				},
 				{
-					Id: "my-second-migration",
+					Id:     "my-second-migration",
 					Status: string(MigrationApplied),
 				},
 				{
-					Id: "my-third-migration",
+					Id:     "my-third-migration",
 					Status: string(MigrationApplied),
 				},
 			},
@@ -231,15 +233,15 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
 						ExpectedId: "my-first-migration",
-						Err: nil,
+						Err:        nil,
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 					},
 					{
-						ExpectedId: "my-second-migration",
-						Err: errors.New("could not get second migraion"),
+						ExpectedId:      "my-second-migration",
+						Err:             errors.New("could not get second migraion"),
 						MigrationRecord: nil,
 					},
 				},
@@ -247,7 +249,7 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 			expectedErr: errors.New("could not get second migraion"),
 			expectedMigs: []*MigrationRecord{
 				{
-					Id: "my-first-migration",
+					Id:     "my-first-migration",
 					Status: string(MigrationApplied),
 				},
 			},
@@ -278,23 +280,23 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
 						ExpectedId: "my-first-migration",
-						Err: nil,
+						Err:        nil,
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 					},
 					{
 						ExpectedId: "my-second-migration",
-						Err: nil,
+						Err:        nil,
 						MigrationRecord: &MigrationRecord{
-							Id: "my-second-migration",
+							Id:     "my-second-migration",
 							Status: string(MigrationApplied),
 						},
 					},
 					{
-						ExpectedId: "my-third-migration",
-						Err: nil,
+						ExpectedId:      "my-third-migration",
+						Err:             nil,
 						MigrationRecord: nil,
 					},
 				},
@@ -302,61 +304,60 @@ func Test_Migrator_ListMigrations(t *testing.T) {
 			expectedErr: nil,
 			expectedMigs: []*MigrationRecord{
 				{
-					Id: "my-first-migration",
+					Id:     "my-first-migration",
 					Status: string(MigrationApplied),
 				},
 				{
-					Id: "my-second-migration",
+					Id:     "my-second-migration",
 					Status: string(MigrationApplied),
 				},
 				{
-					Id: "my-third-migration",
+					Id:     "my-third-migration",
 					Status: string(MigrationPending),
 				},
 			},
 		},
 	}
 
-	for _, test := range(tests) {
+	for _, test := range tests {
 		t.Run(test.name, func(tt *testing.T) {
 
 			sqlDB, _, err := sqlmock.New()
 			dbConn := sqlx.NewDb(sqlDB, "irrelevant")
 
+			//nolint:staticcheck
 			defer sqlDB.Close()
 
 			if err != nil {
 				tt.Error("failed to build db connection")
 				return
 			}
-		
+
 			m := Migrator{
 				handler: test.h,
-				conn: dbConn,
-				opts: Opts{},
-				migs: test.migs,
+				conn:    dbConn,
+				opts:    Opts{},
+				migs:    test.migs,
 			}
-		
+
 			res, err := m.ListMigrations()
-		
+
 			assert.Equal(t, test.expectedMigs, res)
 			assert.Equal(t, test.expectedErr, err)
 		})
 	}
 }
 
-
-
 func Test_Migrator_Up(t *testing.T) {
-	tests := []struct{
-		name string
-		buildDB func() (*sqlx.DB, *sql.DB, sqlmock.Sqlmock, error)
-		configureDB func(sqlmock.Sqlmock)
-		h *handlerStub
-		migs MigrationList
-		target string
-		expectedLogs []map[string]interface{}
-		expectedErr error
+	tests := []struct {
+		name            string
+		buildDB         func() (*sqlx.DB, *sql.DB, sqlmock.Sqlmock, error)
+		configureDB     func(sqlmock.Sqlmock)
+		h               *handlerStub
+		migs            MigrationList
+		target          string
+		expectedLogs    []map[string]interface{}
+		expectedErr     error
 		expectedErrType interface{}
 	}{
 		{
@@ -387,8 +388,8 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 
 		{
-			name: "To latest with empty migration list",
-			migs: MigrationList{},
+			name:   "To latest with empty migration list",
+			migs:   MigrationList{},
 			target: MigrateToLatest,
 			h: &handlerStub{
 				T: t,
@@ -401,7 +402,7 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 
 		{
-			name: "To specific target that can't be found",
+			name:   "To specific target that can't be found",
 			target: "my-missing-migration",
 			migs: MigrationList{
 				migrations: []Migration{
@@ -421,7 +422,7 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 
 		{
-			name: "error fetching first from db",
+			name:   "error fetching first from db",
 			target: MigrateToLatest,
 			migs: MigrationList{
 				migrations: []Migration{
@@ -439,9 +440,9 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: errors.New("could not connect for first migration"),
+						Err:             errors.New("could not connect for first migration"),
 					},
 				},
 			},
@@ -452,9 +453,9 @@ func Test_Migrator_Up(t *testing.T) {
 			name: "create transaction fails",
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -477,9 +478,9 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 			},
@@ -487,13 +488,13 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 
 		{
-			name: "migration fails, and is rolled back",
+			name:   "migration fails, and is rolled back",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -530,27 +531,27 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotExecuteMigration{
-				Name: "my-first-migration",
-				Wrapped: errors.New("failed to run migration"),
+				Name:          "my-first-migration",
+				Wrapped:       errors.New("failed to run migration"),
 				RollbackError: nil,
 			},
 		},
 
 		{
-			name: "migration fails and rollback fails",
+			name:   "migration fails and rollback fails",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -587,32 +588,32 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotExecuteMigration{
-				Name: "my-first-migration",
-				Wrapped: errors.New("failed to run migration"),
+				Name:          "my-first-migration",
+				Wrapped:       errors.New("failed to run migration"),
 				RollbackError: errors.New("cannee rollback"),
 			},
 		},
 
 		{
-			name: "migration succeeds and is recorded",
+			name:   "migration succeeds and is recorded",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -647,18 +648,18 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationApplied,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationApplied,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
@@ -666,24 +667,24 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 
 		{
-			name: "migration succeeds but recording fails",
+			name:   "migration succeeds but recording fails",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "error",
-					"error": "failed to record",
+					"level":   "error",
+					"error":   "failed to record",
 					"message": "failed to record migration state for successful migration",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -718,18 +719,18 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationApplied,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationApplied,
 						ExpectedAction: "apply",
-						Err: errors.New("failed to record"),
+						Err:            errors.New("failed to record"),
 					},
 				},
 			},
@@ -737,13 +738,13 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 
 		{
-			name: "migration commit fails and is recorded correctly",
+			name:   "migration commit fails and is recorded correctly",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -778,41 +779,41 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationFailed,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationFailed,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotExecuteMigration{
-				Name: "my-first-migration",
+				Name:        "my-first-migration",
 				CommitError: errors.New("could not commit"),
 			},
 		},
 
 		{
-			name: "migration commit fails and recording fails",
+			name:   "migration commit fails and recording fails",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "error",
-					"error": "failed to record",
+					"level":   "error",
+					"error":   "failed to record",
 					"message": "failed to record migration state for failed apply",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -847,35 +848,35 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationFailed,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationFailed,
 						ExpectedAction: "apply",
-						Err: errors.New("failed to record"),
+						Err:            errors.New("failed to record"),
 					},
 				},
 			},
 			expectedErr: ErrCouldNotExecuteMigration{
-				Name: "my-first-migration",
+				Name:        "my-first-migration",
 				CommitError: errors.New("could not commit"),
 			},
 		},
 
 		{
-			name: "applied migration is skipped",
+			name:   "applied migration is skipped",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "already applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			migs: MigrationList{
@@ -901,7 +902,7 @@ func Test_Migrator_Up(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -913,38 +914,38 @@ func Test_Migrator_Up(t *testing.T) {
 
 		// TODO...
 		{
-			name: "multiple migrations applied successfully",
+			name:   "multiple migrations applied successfully",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully applied",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-third-migration",
+					"id":      "my-third-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully applied",
-					"id": "my-third-migration",
+					"id":      "my-third-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1009,40 +1010,40 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 					{
-						ExpectedId: "my-second-migration",
+						ExpectedId:      "my-second-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 					{
-						ExpectedId: "my-third-migration",
+						ExpectedId:      "my-third-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationApplied,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationApplied,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 					{
-						ExpectedId: "my-second-migration",
-						ExpectedState: MigrationApplied,
+						ExpectedId:     "my-second-migration",
+						ExpectedState:  MigrationApplied,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 					{
-						ExpectedId: "my-third-migration",
-						ExpectedState: MigrationApplied,
+						ExpectedId:     "my-third-migration",
+						ExpectedState:  MigrationApplied,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
@@ -1050,13 +1051,13 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 
 		{
-			name: "first of multiple migrations fails",
+			name:   "first of multiple migrations fails",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1107,45 +1108,45 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationFailed,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationFailed,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotExecuteMigration{
-				Name: "my-first-migration",
+				Name:        "my-first-migration",
 				CommitError: errors.New("could not commit first"),
 			},
 		},
 
 		{
-			name: "secondary migration fails after initial success",
+			name:   "secondary migration fails after initial success",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1202,56 +1203,56 @@ func Test_Migrator_Up(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 					{
-						ExpectedId: "my-second-migration",
+						ExpectedId:      "my-second-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationApplied,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationApplied,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 					{
-						ExpectedId: "my-second-migration",
-						ExpectedState: MigrationFailed,
+						ExpectedId:     "my-second-migration",
+						ExpectedState:  MigrationFailed,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotExecuteMigration{
-				Name: "my-second-migration",
+				Name:        "my-second-migration",
 				CommitError: errors.New("could not commit second"),
 			},
 		},
 
 		{
-			name: "first migration is skipped",
+			name:   "first migration is skipped",
 			target: MigrateToLatest,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "already applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "applying",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully applied",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1294,24 +1295,24 @@ func Test_Migrator_Up(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
 					},
 					{
-						ExpectedId: "my-second-migration",
+						ExpectedId:      "my-second-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 				},
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-second-migration",
-						ExpectedState: MigrationApplied,
+						ExpectedId:     "my-second-migration",
+						ExpectedState:  MigrationApplied,
 						ExpectedAction: "apply",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
@@ -1319,12 +1320,13 @@ func Test_Migrator_Up(t *testing.T) {
 		},
 	}
 
-	for _, test := range(tests) {
+	for _, test := range tests {
 		t.Run(test.name, func(tt *testing.T) {
-		
+
 			sqlMock, mock, err := sqlmock.New()
 			dbConn := sqlx.NewDb(sqlMock, "irrelevant")
 
+			//nolint:staticcheck
 			defer sqlMock.Close()
 
 			if err != nil {
@@ -1341,14 +1343,14 @@ func Test_Migrator_Up(t *testing.T) {
 
 			m := Migrator{
 				handler: test.h,
-				conn: dbConn,
-				opts: Opts{},
-				migs: test.migs,
-				logger: logger,
+				conn:    dbConn,
+				opts:    Opts{},
+				migs:    test.migs,
+				logger:  logger,
 			}
-		
+
 			err = m.Up(test.target)
-		
+
 			if test.expectedErr == nil && test.expectedErrType != nil {
 				assert.IsType(t, test.expectedErrType, err)
 			} else {
@@ -1361,15 +1363,15 @@ func Test_Migrator_Up(t *testing.T) {
 }
 
 func Test_Migrator_Down(t *testing.T) {
-	tests := []struct{
-		name string
-		buildDB func() (*sqlx.DB, *sql.DB, sqlmock.Sqlmock, error)
-		configureDB func(sqlmock.Sqlmock)
-		h *handlerStub
-		migs MigrationList
-		target string
-		expectedLogs []map[string]interface{}
-		expectedErr error
+	tests := []struct {
+		name            string
+		buildDB         func() (*sqlx.DB, *sql.DB, sqlmock.Sqlmock, error)
+		configureDB     func(sqlmock.Sqlmock)
+		h               *handlerStub
+		migs            MigrationList
+		target          string
+		expectedLogs    []map[string]interface{}
+		expectedErr     error
 		expectedErrType interface{}
 	}{
 		{
@@ -1400,8 +1402,8 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 
 		{
-			name: "To first with empty migration list",
-			migs: MigrationList{},
+			name:   "To first with empty migration list",
+			migs:   MigrationList{},
 			target: MigrateToNothing,
 			h: &handlerStub{
 				T: t,
@@ -1414,7 +1416,7 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 
 		{
-			name: "To specific target that can't be found",
+			name:   "To specific target that can't be found",
 			target: "my-missing-migration",
 			migs: MigrationList{
 				migrations: []Migration{
@@ -1434,7 +1436,7 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 
 		{
-			name: "error fetching first from db",
+			name:   "error fetching first from db",
 			target: MigrateToNothing,
 			migs: MigrationList{
 				migrations: []Migration{
@@ -1452,9 +1454,9 @@ func Test_Migrator_Down(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-first-migration",
+						ExpectedId:      "my-first-migration",
 						MigrationRecord: nil,
-						Err: errors.New("could not connect for first migration"),
+						Err:             errors.New("could not connect for first migration"),
 					},
 				},
 			},
@@ -1465,9 +1467,9 @@ func Test_Migrator_Down(t *testing.T) {
 			name: "create transaction fails",
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1492,7 +1494,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -1506,9 +1508,9 @@ func Test_Migrator_Down(t *testing.T) {
 			name: "skipped if rolled back",
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "skipping rollback; not applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			target: MigrateToNothing,
@@ -1530,7 +1532,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationRolledBack),
 						},
 						Err: nil,
@@ -1544,9 +1546,9 @@ func Test_Migrator_Down(t *testing.T) {
 			name: "skipped if pending",
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "skipping rollback; not applied",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			target: MigrateToNothing,
@@ -1568,7 +1570,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationPending),
 						},
 						Err: nil,
@@ -1579,13 +1581,13 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 
 		{
-			name: "migration fails, and is rolled back",
+			name:   "migration fails, and is rolled back",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1620,7 +1622,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -1628,20 +1630,20 @@ func Test_Migrator_Down(t *testing.T) {
 				},
 			},
 			expectedErr: ErrCouldNotRollbackMigration{
-				Name: "my-first-migration",
-				Wrapped: errors.New("failed to run rollback"),
+				Name:          "my-first-migration",
+				Wrapped:       errors.New("failed to run rollback"),
 				RollbackError: nil,
 			},
 		},
 
 		{
-			name: "migration fails and rollback fails",
+			name:   "migration fails and rollback fails",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1676,7 +1678,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-miration",
+							Id:     "my-first-miration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -1684,25 +1686,25 @@ func Test_Migrator_Down(t *testing.T) {
 				},
 			},
 			expectedErr: ErrCouldNotRollbackMigration{
-				Name: "my-first-migration",
-				Wrapped: errors.New("failed to run migration"),
+				Name:          "my-first-migration",
+				Wrapped:       errors.New("failed to run migration"),
 				RollbackError: errors.New("cannee rollback"),
 			},
 		},
 
 		{
-			name: "migration succeeds and is recorded",
+			name:   "migration succeeds and is recorded",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully rolled back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1735,7 +1737,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -1744,10 +1746,10 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationRolledBack,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationRolledBack,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
@@ -1755,24 +1757,24 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 
 		{
-			name: "migration succeeds but recording fails",
+			name:   "migration succeeds but recording fails",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully rolled back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "error",
-					"error": "failed to record",
+					"level":   "error",
+					"error":   "failed to record",
 					"message": "failed to record migration state for successful rollback",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1805,7 +1807,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -1814,10 +1816,10 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationRolledBack,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationRolledBack,
 						ExpectedAction: "rollback",
-						Err: errors.New("failed to record"),
+						Err:            errors.New("failed to record"),
 					},
 				},
 			},
@@ -1825,13 +1827,13 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 
 		{
-			name: "migration commit fails and is recorded correctly",
+			name:   "migration commit fails and is recorded correctly",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1864,7 +1866,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -1873,33 +1875,33 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationRollbackFailed,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationRollbackFailed,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotRollbackMigration{
-				Name: "my-first-migration",
+				Name:        "my-first-migration",
 				CommitError: errors.New("could not commit"),
 			},
 		},
 
 		{
-			name: "migration commit fails and recording fails",
+			name:   "migration commit fails and recording fails",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "error",
-					"error": "failed to record",
+					"level":   "error",
+					"error":   "failed to record",
 					"message": "failed to record migration state for failed roll back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -1932,7 +1934,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -1941,52 +1943,52 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationRollbackFailed,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationRollbackFailed,
 						ExpectedAction: "rollback",
-						Err: errors.New("failed to record"),
+						Err:            errors.New("failed to record"),
 					},
 				},
 			},
 			expectedErr: ErrCouldNotRollbackMigration{
-				Name: "my-first-migration",
+				Name:        "my-first-migration",
 				CommitError: errors.New("could not commit"),
 			},
 		},
 
 		{
-			name: "multiple migrations rolled back successfully",
+			name:   "multiple migrations rolled back successfully",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-third-migration",
+					"id":      "my-third-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully rolled back",
-					"id": "my-third-migration",
+					"id":      "my-third-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully rolled back",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully rolled back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -2041,7 +2043,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-third-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-third-migration",
+							Id:     "my-third-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -2049,7 +2051,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-second-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-second-migration",
+							Id:     "my-second-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -2057,7 +2059,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -2066,22 +2068,22 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-third-migration",
-						ExpectedState: MigrationRolledBack,
+						ExpectedId:     "my-third-migration",
+						ExpectedState:  MigrationRolledBack,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 					{
-						ExpectedId: "my-second-migration",
-						ExpectedState: MigrationRolledBack,
+						ExpectedId:     "my-second-migration",
+						ExpectedState:  MigrationRolledBack,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationRolledBack,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationRolledBack,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
@@ -2089,13 +2091,13 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 
 		{
-			name: "first of multiple migrations fails",
+			name:   "first of multiple migrations fails",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-third-migration",
+					"id":      "my-third-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -2140,7 +2142,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-third-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-third-migration",
+							Id:     "my-third-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -2149,37 +2151,37 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-third-migration",
-						ExpectedState: MigrationRollbackFailed,
+						ExpectedId:     "my-third-migration",
+						ExpectedState:  MigrationRollbackFailed,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotRollbackMigration{
-				Name: "my-third-migration",
+				Name:        "my-third-migration",
 				CommitError: errors.New("could not commit third"),
 			},
 		},
 
 		{
-			name: "secondary migration fails after initial success",
+			name:   "secondary migration fails after initial success",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-third-migration",
+					"id":      "my-third-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully rolled back",
-					"id": "my-third-migration",
+					"id":      "my-third-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -2228,7 +2230,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-third-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-third-migration",
+							Id:     "my-third-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -2236,7 +2238,7 @@ func Test_Migrator_Down(t *testing.T) {
 					{
 						ExpectedId: "my-second-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-second-migration",
+							Id:     "my-second-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -2245,43 +2247,43 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-third-migration",
-						ExpectedState: MigrationRolledBack,
+						ExpectedId:     "my-third-migration",
+						ExpectedState:  MigrationRolledBack,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 					{
-						ExpectedId: "my-second-migration",
-						ExpectedState: MigrationRollbackFailed,
+						ExpectedId:     "my-second-migration",
+						ExpectedState:  MigrationRollbackFailed,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
 			expectedErr: ErrCouldNotRollbackMigration{
-				Name: "my-second-migration",
+				Name:        "my-second-migration",
 				CommitError: errors.New("could not commit second"),
 			},
 		},
 
 		{
-			name: "non-applied migration is skipped",
+			name:   "non-applied migration is skipped",
 			target: MigrateToNothing,
 			expectedLogs: []map[string]interface{}{
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "skipping rollback; not applied",
-					"id": "my-second-migration",
+					"id":      "my-second-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "rolling back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 				{
-					"level": "info",
+					"level":   "info",
 					"message": "successfully rolled back",
-					"id": "my-first-migration",
+					"id":      "my-first-migration",
 				},
 			},
 			configureDB: func(m sqlmock.Sqlmock) {
@@ -2316,14 +2318,14 @@ func Test_Migrator_Down(t *testing.T) {
 
 				FetchMigrationFromDbCalls: []handlerFetchMigrationFromDbCall{
 					{
-						ExpectedId: "my-second-migration",
+						ExpectedId:      "my-second-migration",
 						MigrationRecord: nil,
-						Err: nil,
+						Err:             nil,
 					},
 					{
 						ExpectedId: "my-first-migration",
 						MigrationRecord: &MigrationRecord{
-							Id: "my-first-migration",
+							Id:     "my-first-migration",
 							Status: string(MigrationApplied),
 						},
 						Err: nil,
@@ -2332,10 +2334,10 @@ func Test_Migrator_Down(t *testing.T) {
 
 				RecordMigrationInDbCalls: []handlerRecordMigrationInDbCall{
 					{
-						ExpectedId: "my-first-migration",
-						ExpectedState: MigrationRolledBack,
+						ExpectedId:     "my-first-migration",
+						ExpectedState:  MigrationRolledBack,
 						ExpectedAction: "rollback",
-						Err: nil,
+						Err:            nil,
 					},
 				},
 			},
@@ -2343,12 +2345,13 @@ func Test_Migrator_Down(t *testing.T) {
 		},
 	}
 
-	for _, test := range(tests) {
+	for _, test := range tests {
 		t.Run(test.name, func(tt *testing.T) {
-		
+
 			sqlMock, mock, err := sqlmock.New()
 			dbConn := sqlx.NewDb(sqlMock, "irrelevant")
 
+			//nolint:staticcheck
 			defer sqlMock.Close()
 
 			if err != nil {
@@ -2365,14 +2368,14 @@ func Test_Migrator_Down(t *testing.T) {
 
 			m := Migrator{
 				handler: test.h,
-				conn: dbConn,
-				opts: Opts{},
-				migs: test.migs,
-				logger: logger,
+				conn:    dbConn,
+				opts:    Opts{},
+				migs:    test.migs,
+				logger:  logger,
 			}
-		
+
 			err = m.Down(test.target)
-		
+
 			if test.expectedErr == nil && test.expectedErrType != nil {
 				assert.IsType(t, test.expectedErrType, err)
 			} else {

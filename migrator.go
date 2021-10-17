@@ -8,7 +8,7 @@ import (
 type migrationHandler interface {
 	CreateMigrationsTable() error
 	// Later...
-	//CreateMigrationsLockTable(*sqlx.Tx) error 
+	//CreateMigrationsLockTable(*sqlx.Tx) error
 	DoesTableExist(table string) (bool, error)
 
 	FetchMigrationFromDb(id string) (*MigrationRecord, error)
@@ -16,16 +16,16 @@ type migrationHandler interface {
 }
 
 type Opts struct {
-	Schema string
+	Schema  string
 	Applyer string
 }
 
 type Migrator struct {
-	conn *sqlx.DB
+	conn    *sqlx.DB
 	handler migrationHandler
-	migs MigrationList
-	opts Opts
-	logger zerolog.Logger
+	migs    MigrationList
+	opts    Opts
+	logger  zerolog.Logger
 }
 
 func (m *Migrator) getMigrationState(id string) (MigrationState, error) {
@@ -261,14 +261,14 @@ func (m *Migrator) ListMigrations() ([]*MigrationRecord, error) {
 
 func NewMigrator(dbConn *sqlx.DB, migs MigrationList, opts Opts, logger zerolog.Logger) (*Migrator, error) {
 	driver := dbConn.DriverName()
-	
+
 	var handler migrationHandler
 	switch driver {
 	case "postgres":
 		handler = &postgresHandler{
 			conn: dbConn,
 			opts: opts,
-			l: logger,
+			l:    logger,
 		}
 	default:
 		return nil, ErrMigrationsNotImplementedForDriver{
@@ -277,9 +277,9 @@ func NewMigrator(dbConn *sqlx.DB, migs MigrationList, opts Opts, logger zerolog.
 	}
 
 	return &Migrator{
-		conn: dbConn,
+		conn:    dbConn,
 		handler: handler,
-		opts: opts,
-		migs: migs,
+		opts:    opts,
+		migs:    migs,
 	}, nil
 }

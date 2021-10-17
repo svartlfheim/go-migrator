@@ -6,6 +6,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_NewMigrationList(t *testing.T) {
+	migs := []Migration{
+		{
+			Id: "my-mig-1",
+		},
+		{
+			Id: "my-mig-2",
+		},
+		{
+			Id: "my-mig-3",
+		},
+	}
+
+	ml := NewMigrationList(migs)
+
+	assert.Equal(t, migs, ml.All())
+}
+
 func Test_MigrationList_All(t *testing.T) {
 	tests := []struct {
 		name string

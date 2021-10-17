@@ -8,34 +8,34 @@ import (
 )
 
 type DBBeginxCall struct {
-	Tx *sqlx.Tx
+	Tx  *sqlx.Tx
 	Err error
 }
 
 type DBQueryxCall struct {
 	Rows *sqlx.Rows
-	Err error
+	Err  error
 }
 
 type DBExecCall struct {
 	Result sql.Result
-	Err error
+	Err    error
 }
 
 type DB struct {
-	T *testing.T
+	T      *testing.T
 	Driver string
 
-	BeginxCalls []DBBeginxCall
+	BeginxCalls     []DBBeginxCall
 	beginxCallCount int
 
-	QueryxCalls []DBQueryxCall
+	QueryxCalls     []DBQueryxCall
 	queryxCallCount int
 
-	ExecCalls []DBExecCall
+	ExecCalls     []DBExecCall
 	execCallCount int
 
-	GetCalls []error
+	GetCalls     []error
 	getCallCount int
 }
 
@@ -49,7 +49,7 @@ func (db *DB) Beginx() (tx *sqlx.Tx, err error) {
 		return
 	}
 
-	if db.beginxCallCount > (len(db.BeginxCalls) -1) {
+	if db.beginxCallCount > (len(db.BeginxCalls) - 1) {
 		db.T.Error("Too many calls to Beginx")
 		return
 	}
@@ -61,13 +61,13 @@ func (db *DB) Beginx() (tx *sqlx.Tx, err error) {
 	return call.Tx, call.Err
 }
 
-func (db *DB)Queryx(query string, args ...interface{}) (rows *sqlx.Rows, err error) {
+func (db *DB) Queryx(query string, args ...interface{}) (rows *sqlx.Rows, err error) {
 	if len(db.QueryxCalls) == 0 {
 		db.T.Error("Queryx was not expected to be called")
 		return
 	}
 
-	if db.queryxCallCount > (len(db.QueryxCalls) -1) {
+	if db.queryxCallCount > (len(db.QueryxCalls) - 1) {
 		db.T.Error("Too many calls to Queryx")
 		return
 	}
@@ -85,7 +85,7 @@ func (db *DB) Get(dest interface{}, query string, args ...interface{}) (err erro
 		return
 	}
 
-	if db.getCallCount > (len(db.GetCalls) -1) {
+	if db.getCallCount > (len(db.GetCalls) - 1) {
 		db.T.Error("Too many calls to Get")
 		return
 	}
@@ -103,7 +103,7 @@ func (db *DB) Exec(query string, args ...interface{}) (res sql.Result, err error
 		return
 	}
 
-	if db.execCallCount > (len(db.ExecCalls) -1) {
+	if db.execCallCount > (len(db.ExecCalls) - 1) {
 		db.T.Error("Too many calls to Exec")
 		return
 	}
