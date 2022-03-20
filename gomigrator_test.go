@@ -166,6 +166,16 @@ func TestIntegration_Migrator_Up_AllApplied(t *testing.T) {
 		},
 		{
 			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "successfully applied",
+		},
+		{
+			"id":      "my-first-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -176,6 +186,16 @@ func TestIntegration_Migrator_Up_AllApplied(t *testing.T) {
 		},
 		{
 			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "successfully applied",
+		},
+		{
+			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -183,6 +203,16 @@ func TestIntegration_Migrator_Up_AllApplied(t *testing.T) {
 			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "no existing entry for migration",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "successfully applied",
 		},
 		{
 			"id":      "my-third-mig",
@@ -243,6 +273,16 @@ func TestIntegration_Migrator_Up_FirstApplied(t *testing.T) {
 		{
 			"level":   "info",
 			"message": "Creating migrations table as it was not present.",
+		},
+		{
+			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "successfully applied",
 		},
 		{
 			"id":      "my-first-mig",
@@ -355,6 +395,16 @@ func TestIntegration_Migrator_Down_FullRollback(t *testing.T) {
 		},
 		{
 			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "successfully applied",
+		},
+		{
+			"id":      "my-first-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -365,6 +415,16 @@ func TestIntegration_Migrator_Down_FullRollback(t *testing.T) {
 		},
 		{
 			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "successfully applied",
+		},
+		{
+			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -372,6 +432,16 @@ func TestIntegration_Migrator_Down_FullRollback(t *testing.T) {
 			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "no existing entry for migration",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "successfully applied",
 		},
 		{
 			"id":      "my-third-mig",
@@ -389,6 +459,16 @@ func TestIntegration_Migrator_Down_FullRollback(t *testing.T) {
 		},
 		{
 			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "rolling back",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "successfully rolled back",
+		},
+		{
+			"id":      "my-third-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -399,6 +479,16 @@ func TestIntegration_Migrator_Down_FullRollback(t *testing.T) {
 		},
 		{
 			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "rolling back",
+		},
+		{
+			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "successfully rolled back",
+		},
+		{
+			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -406,6 +496,16 @@ func TestIntegration_Migrator_Down_FullRollback(t *testing.T) {
 			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "found existing entry for migration",
+		},
+		{
+			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "rolling back",
+		},
+		{
+			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "successfully rolled back",
 		},
 		{
 			"id":      "my-first-mig",
@@ -512,6 +612,16 @@ func TestIntegration_Migrator_Down_RollbackToTarget(t *testing.T) {
 		},
 		{
 			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-first-mig",
+			"level":   "info",
+			"message": "successfully applied",
+		},
+		{
+			"id":      "my-first-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -522,6 +632,16 @@ func TestIntegration_Migrator_Down_RollbackToTarget(t *testing.T) {
 		},
 		{
 			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "successfully applied",
+		},
+		{
+			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -529,6 +649,16 @@ func TestIntegration_Migrator_Down_RollbackToTarget(t *testing.T) {
 			"id":      "my-second-mig",
 			"level":   "debug",
 			"message": "no existing entry for migration",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "applying",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "successfully applied",
 		},
 		{
 			"id":      "my-third-mig",
@@ -546,6 +676,16 @@ func TestIntegration_Migrator_Down_RollbackToTarget(t *testing.T) {
 		},
 		{
 			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "rolling back",
+		},
+		{
+			"id":      "my-third-mig",
+			"level":   "info",
+			"message": "successfully rolled back",
+		},
+		{
+			"id":      "my-third-mig",
 			"level":   "debug",
 			"message": "recording state",
 		},
@@ -553,6 +693,16 @@ func TestIntegration_Migrator_Down_RollbackToTarget(t *testing.T) {
 			"id":      "my-third-mig",
 			"level":   "debug",
 			"message": "found existing entry for migration",
+		},
+		{
+			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "rolling back",
+		},
+		{
+			"id":      "my-second-mig",
+			"level":   "info",
+			"message": "successfully rolled back",
 		},
 		{
 			"id":      "my-second-mig",

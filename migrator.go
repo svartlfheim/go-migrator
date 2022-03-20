@@ -281,5 +281,6 @@ func NewMigrator(dbConn *sqlx.DB, migs MigrationList, opts Opts, logger zerolog.
 		handler: handler,
 		opts:    opts,
 		migs:    migs,
+		logger:  logger,
 	}, nil
 }
